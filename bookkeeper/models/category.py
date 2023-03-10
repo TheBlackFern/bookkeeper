@@ -95,7 +95,7 @@ class Category:
         The tree is topologically sorted, i.e. children are placed after their parents.
         Data correctness isn't checked. For a DBMS with foreign key checks an exeption
         is raised (IntergrityError for sqlite3). For a DBMS with no checks the end
-        result could be correct if initial data is correct except for sorting, and
+        result could be correct if the initial data is correct except for sorting, and
         couldn't otherwise, "garbage in, garbage out".
 
         Parameters
