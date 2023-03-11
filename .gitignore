@@ -75,6 +75,9 @@ docs/_build/
 .pybuilder/
 target/
 
+# PyQT
+.ui
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
