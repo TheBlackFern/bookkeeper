@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from bookkeeper.view.main_window_ui import Ui_MainWindow
-from bookkeeper.view.dlg_categories_ui import Ui_Dialog_Categories
+from bookkeeper.view.dlg_categories_ui import Dialog_Categories
 from bookkeeper.view.dlg_budget_ui import Dialog_Budget
 from bookkeeper.view.dlg_category_ui import Dialog_Category
 from bookkeeper.view.dlg_expense_ui import Dialog_Expense
@@ -32,11 +32,6 @@ from bookkeeper.models.budget import Budget
 #     self.layout.addWidget(message)
 #     self.layout.addWidget(self.buttonBox)
 #     self.setLayout(self.layout)
-
-
-class CategoriesDlg(QDialog, Ui_Dialog_Categories):
-    def __init__(self):
-        super(CategoriesDlg, self).__init__()
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -61,9 +56,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.changeBudgetButton.clicked.connect(self.on_change_budget_clicked)
         self.showCategoriesButton.clicked.connect(self.on_show_categories_clicked)
         self.removeExpenseButton.clicked.connect(self.on_remove_expense_clicked)
-
-    def on_show_categories_clicked(self):
-        ...
 
     def on_change_budget_clicked(self):
         dialog = Dialog_Budget()
@@ -145,17 +137,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_budget_text(week_sum, "week")
         self.set_budget_text(month_sum, "month")
 
-    def add_category(self, name: str, parent_category: str):
-        print(name, parent_category)
+    def add_category(self, dialog, name: str, parent_category: str):
+        cat_names = {name for (name, _) in self._cats}
+        if name in cat_names:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Категория с таким именем уже существует!")
+            msg.setWindowTitle("Ошибка")
+            msg.exec()
+            dialog.reject()
+            return
         actual_parent = parent_category if parent_category != "-" else None
         self._cats.append((name, actual_parent))
         self.update()
+        dialog.accept()
 
     def on_add_category_clicked(self):
         dialog = Dialog_Category(self._cats)
         dialog.buttonBox.accepted.connect(
             lambda: self.add_category(
-                dialog.setNameLine.text(), dialog.selectCategoryBox.currentText()
+                dialog,
+                dialog.setNameLine.text(),
+                dialog.selectCategoryBox.currentText(),
             )
         )
         dialog.exec()
