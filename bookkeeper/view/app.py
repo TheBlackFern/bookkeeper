@@ -1,4 +1,3 @@
-from functools import partial
 import sys
 import datetime
 from typing import Iterable
@@ -56,6 +55,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.changeBudgetButton.clicked.connect(self.on_change_budget_clicked)
         self.showCategoriesButton.clicked.connect(self.on_show_categories_clicked)
         self.removeExpenseButton.clicked.connect(self.on_remove_expense_clicked)
+
+    def on_show_categories_clicked(self):
+        dialog = Dialog_Categories(self._cats)
+        dialog.removeCategoryButton.clicked.connect(
+            lambda: self.on_remove_category_clicked(dialog)
+        )
+        dialog.exec()
+
+    def on_remove_category_clicked(self, dialog):
+        selected_item = dialog.treeWidget.currentItem()
+        if selected_item:
+            parent_item = selected_item.parent()
+            if parent_item is not None:
+                parent_item.removeChild(selected_item)
+            else:
+                index = dialog.treeWidget.indexOfTopLevelItem(selected_item)
+                dialog.treeWidget.takeTopLevelItem(index)
 
     def on_change_budget_clicked(self):
         dialog = Dialog_Budget()

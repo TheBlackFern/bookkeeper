@@ -8,40 +8,104 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDialog, QHeaderView, QLabel,
-    QSizePolicy, QTreeWidget, QTreeWidgetItem, QWidget)
+from PySide6.QtCore import (
+    QCoreApplication,
+    QDate,
+    QDateTime,
+    QLocale,
+    QMetaObject,
+    QObject,
+    QPoint,
+    QRect,
+    QSize,
+    QTime,
+    QUrl,
+    Qt,
+)
+from PySide6.QtGui import (
+    QBrush,
+    QColor,
+    QConicalGradient,
+    QCursor,
+    QFont,
+    QFontDatabase,
+    QGradient,
+    QIcon,
+    QImage,
+    QKeySequence,
+    QLinearGradient,
+    QPainter,
+    QPalette,
+    QPixmap,
+    QRadialGradient,
+    QTransform,
+)
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QHeaderView,
+    QLabel,
+    QVBoxLayout,
+    QSizePolicy,
+    QPushButton,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QWidget,
+)
 
-class Ui_Dialog_Categories(object):
-    def setupUi(self, Dialog_Categories):
-        if not Dialog_Categories.objectName():
-            Dialog_Categories.setObjectName(u"Dialog_Categories")
-        Dialog_Categories.resize(482, 515)
-        self.treeWidget = QTreeWidget(Dialog_Categories)
-        self.treeWidget.setObjectName(u"treeWidget")
-        self.treeWidget.setGeometry(QRect(0, 40, 481, 521))
-        self.label = QLabel(Dialog_Categories)
-        self.label.setObjectName(u"label")
+
+class Dialog_Categories(QDialog):
+    def __init__(self, cats):
+        super().__init__()
+        self.resize(482, 515)
+        self.setWindowTitle("Список категорий")
+        self.verticalLayout = QVBoxLayout()
+
+        self.label = QLabel()
+        self.label.setObjectName("label")
         self.label.setGeometry(QRect(0, 10, 471, 21))
-        self.label.setStyleSheet(u"background-color: rgb(255,255, 255);\n"
-"font: 11pt;\n"
-"border-radius: 10px")
+        self.label.setStyleSheet(
+            "background-color: rgb(255,255, 255);\n"
+            "font: 11pt;\n"
+            "border-radius: 10px"
+        )
         self.label.setLocale(QLocale(QLocale.Russian, QLocale.Russia))
         self.label.setAlignment(Qt.AlignCenter)
+        self.label.setText(
+            QCoreApplication.translate(
+                "Dialog_Categories",
+                "\u0421\u043f\u0438\u0441\u043e\u043a \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0439",
+                None,
+            )
+        )
+        self.verticalLayout.addWidget(self.label)
 
-        self.retranslateUi(Dialog_Categories)
+        self.treeWidget = QTreeWidget()
+        self.treeWidget.setObjectName("treeWidget")
+        self.treeWidget.setGeometry(QRect(0, 40, 481, 521))
+        self.treeWidget.setHeaderHidden(True)
+        self.populate(cats)
 
-        QMetaObject.connectSlotsByName(Dialog_Categories)
-    # setupUi
+        self.verticalLayout.addWidget(self.treeWidget)
 
-    def retranslateUi(self, Dialog_Categories):
-        Dialog_Categories.setWindowTitle(QCoreApplication.translate("Dialog_Categories", u"Dialog", None))
-        self.label.setText(QCoreApplication.translate("Dialog_Categories", u"\u0421\u043f\u0438\u0441\u043e\u043a \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0439", None))
-    # retranslateUi
+        self.removeCategoryButton = QPushButton()
+        self.removeCategoryButton.setText("Удалить категорию со всеми подкатегориями")
+        self.removeCategoryButton.setStyleSheet(
+            "color: white;\n"
+            "background-color: rgb(11, 121, 255);\n"
+            "font: 11pt;\n"
+            "border-radius: 10px"
+        )
+        self.verticalLayout.addWidget(self.removeCategoryButton)
 
+        self.setLayout(self.verticalLayout)
+
+    def populate(self, cats):
+        known_parents = {}
+        for (name, parent) in cats:
+            if parent:
+                parent_item = known_parents[parent]
+                child_item = QTreeWidgetItem(parent_item, [name])
+                known_parents[name] = child_item
+            else:
+                known_parents[name] = QTreeWidgetItem(self.treeWidget, [name])
