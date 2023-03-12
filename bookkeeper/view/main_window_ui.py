@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(529, 723)
+        MainWindow.resize(530, 798)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tableWidget = QTableWidget(self.centralwidget)
@@ -133,7 +133,7 @@ class Ui_MainWindow(object):
         self.removeExpenseButton.setAutoDefault(False)
         self.changeBudgetButton = QPushButton(self.centralwidget)
         self.changeBudgetButton.setObjectName("changeBudgetButton")
-        self.changeBudgetButton.setGeometry(QRect(380, 660, 141, 31))
+        self.changeBudgetButton.setGeometry(QRect(380, 700, 141, 31))
         sizePolicy.setHeightForWidth(
             self.changeBudgetButton.sizePolicy().hasHeightForWidth()
         )
@@ -145,15 +145,15 @@ class Ui_MainWindow(object):
             "border-radius: 10px"
         )
         self.changeBudgetButton.setIconSize(QSize(10, 20))
-        self.budgetLabel = QLabel(self.centralwidget)
-        self.budgetLabel.setObjectName("budgetLabel")
-        self.budgetLabel.setGeometry(QRect(10, 660, 361, 31))
-        self.budgetLabel.setStyleSheet(
+        self.lableBudgetDay = QLabel(self.centralwidget)
+        self.lableBudgetDay.setObjectName("lableBudgetDay")
+        self.lableBudgetDay.setGeometry(QRect(90, 660, 271, 31))
+        self.lableBudgetDay.setStyleSheet(
             "background-color: rgb(255,255, 255);\n"
             "font: 11pt;\n"
             "border-radius: 10px"
         )
-        self.budgetLabel.setAlignment(Qt.AlignCenter)
+        self.lableBudgetDay.setAlignment(Qt.AlignCenter)
         self.addExpenseButton = QPushButton(self.centralwidget)
         self.addExpenseButton.setObjectName("addExpenseButton")
         self.addExpenseButton.setGeometry(QRect(10, 10, 91, 31))
@@ -169,6 +169,39 @@ class Ui_MainWindow(object):
         )
         self.addExpenseButton.setIconSize(QSize(10, 20))
         self.addExpenseButton.setAutoDefault(False)
+        self.label = QLabel(self.centralwidget)
+        self.label.setObjectName("label")
+        self.label.setGeometry(QRect(10, 660, 71, 31))
+        self.label.setStyleSheet("font: 11pt")
+        self.label.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_2 = QLabel(self.centralwidget)
+        self.label_2.setObjectName("label_2")
+        self.label_2.setGeometry(QRect(10, 700, 71, 31))
+        self.label_2.setStyleSheet("font: 11pt")
+        self.label_2.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.lableBudgetWeek = QLabel(self.centralwidget)
+        self.lableBudgetWeek.setObjectName("lableBudgetWeek")
+        self.lableBudgetWeek.setGeometry(QRect(90, 700, 271, 31))
+        self.lableBudgetWeek.setStyleSheet(
+            "background-color: rgb(255,255, 255);\n"
+            "font: 11pt;\n"
+            "border-radius: 10px"
+        )
+        self.lableBudgetWeek.setAlignment(Qt.AlignCenter)
+        self.lableBudgetMonth = QLabel(self.centralwidget)
+        self.lableBudgetMonth.setObjectName("lableBudgetMonth")
+        self.lableBudgetMonth.setGeometry(QRect(90, 740, 271, 31))
+        self.lableBudgetMonth.setStyleSheet(
+            "background-color: rgb(255,255, 255);\n"
+            "font: 11pt;\n"
+            "border-radius: 10px"
+        )
+        self.lableBudgetMonth.setAlignment(Qt.AlignCenter)
+        self.label_3 = QLabel(self.centralwidget)
+        self.label_3.setObjectName("label_3")
+        self.label_3.setGeometry(QRect(10, 740, 71, 31))
+        self.label_3.setStyleSheet("font: 11pt")
+        self.label_3.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -182,7 +215,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(
-            QCoreApplication.translate("MainWindow", "Бухгалтер, милый мой бухгалтер", None)
+            QCoreApplication.translate("MainWindow", "MainWindow", None)
         )
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(
@@ -235,18 +268,51 @@ class Ui_MainWindow(object):
             )
         )
         # if QT_CONFIG(whatsthis)
-        self.budgetLabel.setWhatsThis(
+        self.lableBudgetDay.setWhatsThis(
             QCoreApplication.translate(
                 "MainWindow", "<html><head/><body><p><br/></p></body></html>", None
             )
         )
         # endif // QT_CONFIG(whatsthis)
-        self.budgetLabel.setText(
+        self.lableBudgetDay.setText(
             QCoreApplication.translate("MainWindow", "TextLabel", None)
         )
         self.addExpenseButton.setText(
             QCoreApplication.translate(
                 "MainWindow", "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c", None
+            )
+        )
+        self.label.setText(
+            QCoreApplication.translate("MainWindow", "\u0414\u0435\u043d\u044c", None)
+        )
+        self.label_2.setText(
+            QCoreApplication.translate(
+                "MainWindow", "\u041d\u0435\u0434\u0435\u043b\u044f", None
+            )
+        )
+        # if QT_CONFIG(whatsthis)
+        self.lableBudgetWeek.setWhatsThis(
+            QCoreApplication.translate(
+                "MainWindow", "<html><head/><body><p><br/></p></body></html>", None
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
+        self.lableBudgetWeek.setText(
+            QCoreApplication.translate("MainWindow", "TextLable", None)
+        )
+        # if QT_CONFIG(whatsthis)
+        self.lableBudgetMonth.setWhatsThis(
+            QCoreApplication.translate(
+                "MainWindow", "<html><head/><body><p><br/></p></body></html>", None
+            )
+        )
+        # endif // QT_CONFIG(whatsthis)
+        self.lableBudgetMonth.setText(
+            QCoreApplication.translate("MainWindow", "TextLable", None)
+        )
+        self.label_3.setText(
+            QCoreApplication.translate(
+                "MainWindow", "\u041c\u0435\u0441\u044f\u0446", None
             )
         )
 

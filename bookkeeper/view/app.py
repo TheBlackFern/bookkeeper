@@ -1,5 +1,6 @@
 from functools import partial
 import sys
+import datetime
 from typing import Iterable
 from PySide6.QtWidgets import (
     QApplication,
@@ -64,6 +65,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._bugdet_week = budgets[1]
         self._bugdet_month = budgets[2]
         self.load_data()
+        self.update_budget()
 
         self.addExpenseButton.clicked.connect(self.on_add_expense_clicked)
         self.addCategoryButton.clicked.connect(self.on_add_category_clicked)
@@ -76,6 +78,51 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def on_change_budget_clicked(self):
         ...
+
+    def set_budget_text(self, amount: float, period: str):
+        budget_lables = {
+            "day": (self.lableBudgetDay, self._bugdet_day),
+            "week": (self.lableBudgetWeek, self._bugdet_week),
+            "month": (self.lableBudgetMonth, self._bugdet_month),
+        }
+        current_budget_sum = budget_lables[period][1]
+        current_budget_lable = budget_lables[period][0]
+        current_budget_lable.setText(f"{amount:.2f} / {current_budget_sum.amount:.2f}")
+        if amount > current_budget_sum.amount:
+            current_budget_lable.setStyleSheet(
+                "background-color: rgb(255,255, 255);\n"
+                "font: 11pt;\n"
+                "border-radius: 10px;\n"
+                "color: rgb(255,0,0)"
+            )
+
+    def update_budget(self):
+        today = datetime.date.today()
+        today_sum = 0
+        week_sum = 0
+        month_sum = 0
+
+        for row in range(self.tableWidget.rowCount()):
+            date_str = self.tableWidget.item(row, 0).text()
+            cost_str = self.tableWidget.item(row, 1).text()
+            cost_val = float(cost_str)
+            date_val = datetime.date.fromisoformat(date_str)
+
+            if date_val == today:
+                today_sum += cost_val
+
+            if (
+                date_val.isocalendar()[1] == today.isocalendar()[1]
+                and date_val.year == today.year
+            ):
+                week_sum += cost_val
+
+            if date_val.month == today.month and date_val.year == today.year:
+                month_sum += cost_val
+
+        self.set_budget_text(today_sum, "day")
+        self.set_budget_text(week_sum, "week")
+        self.set_budget_text(month_sum, "month")
 
     def add_category(self, name: str, parent_category: str):
         print(name, parent_category)
@@ -134,48 +181,65 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.tableWidget.setItem(row_num, 1, QTableWidgetItem(row[1]))
             self.tableWidget.setItem(row_num, 2, QTableWidgetItem(row[2]))
             self.tableWidget.setItem(row_num, 3, QTableWidgetItem(row[3]))
+        self.update_budget()
         self.update()
 
 
-cats = """
-продукты
-    мясо
-        сырое мясо
-        мясные продукты
-    сладости
-книги
-одежда
-""".splitlines()
-
-data = [
-    row.strip().split("|")
-    for row in """
-        2023-03-09|7.49|хозтовары|пакет на кассе
-        2023-03-09|104.99|кефир|
-        2023-03-09|129.99|хлеб|
-        2023-03-09|239.98|сладости|пряники|
-        2023-03-09|139.99|сыр|
-        2023-03-09|82.99|сметана|
-        2023-03-06|5536.00|книги|книги по Python и PyQt
-        2023-03-05|478.00|телефон|
-        2023-03-03|78.00|продукты|
-        2023-03-03|1112.00|рыба|
-        2023-03-03|1008.00|рыба|
-        2023-03-03|156.00|рыба|
-        2023-03-03|168.00|сладости|
-        2023-03-03|236.73|фрукты|
-        2023-03-03|16.00|хозтовары|
-        2023-03-03|259.73|книги|
-        2023-03-03|119.86|хлеб|
-        2023-03-03|159.82|крупы|
-        2023-03-03|79.91|макароны|
-        2023-03-03|479.48|овощи|
-    """.strip().splitlines()
-]
-
-
 if __name__ == "__main__":
+    cats = """
+    продукты
+        хлеб
+        молочные
+            молоко
+            кефир
+            сыр
+            сметана
+        мясо
+            сырое мясо
+            мясные продукты
+        сладости
+        рыба
+        фрукты
+        овощи
+        крупы
+        макароны
+    хозтовары
+    книги
+    одежда
+    телефон
+    """.splitlines()
+
+    data = [
+        row.strip().split("|")
+        for row in """
+            2023-03-12|144.99|продукты|чипсы
+            2023-03-09|7.49|хозтовары|пакет на кассе
+            2023-03-09|104.99|кефир|
+            2023-03-09|129.99|хлеб|
+            2023-03-09|239.98|сладости|пряники|
+            2023-03-09|139.99|сыр|
+            2023-03-09|82.99|сметана|
+            2023-03-06|5536.00|книги|книги по Python и PyQt
+            2023-03-05|478.00|телефон|
+            2023-03-03|78.00|продукты|
+            2023-03-03|1112.00|рыба|
+            2023-03-03|1008.00|рыба|
+            2023-03-03|156.00|рыба|
+            2023-03-03|168.00|сладости|
+            2023-03-03|236.73|фрукты|
+            2023-03-03|16.00|хозтовары|
+            2023-03-03|259.73|книги|
+            2023-03-03|119.86|хлеб|
+            2023-03-03|159.82|крупы|
+            2023-03-03|79.91|макароны|
+            2023-03-03|479.48|овощи|
+        """.strip().splitlines()
+    ]
+    day_budget = Budget(1000.00)
+    week_budget = Budget(7000.00)
+    month_budget = Budget(30000.00)
+    bdgts = [day_budget, week_budget, month_budget]
     app = QApplication(sys.argv)
-    window = MainWindow(data, cats)
+    window = MainWindow(data, cats, bdgts)
     window.show()
     app.exec()
