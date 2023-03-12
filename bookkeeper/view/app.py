@@ -55,13 +55,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.changeBudgetButton.clicked.connect(self.on_change_budget_clicked)
         self.showCategoriesButton.clicked.connect(self.on_show_categories_clicked)
         self.removeExpenseButton.clicked.connect(self.on_remove_expense_clicked)
+        self.tableWidget.itemChanged.connect(self.on_expense_change)
+
+    def on_expense_change(self, item):
+        print(item.row(), item.column(), item.text())
+        self.update_budget()
 
     def on_show_categories_clicked(self):
         dialog = Dialog_Categories(self._cats)
+        dialog.treeWidget.itemChanged.connect(self.on_category_change)
+        dialog.treeWidget.itemClicked.connect(self.on_category_selection)
         dialog.removeCategoryButton.clicked.connect(
             lambda: self.on_remove_category_clicked(dialog)
         )
         dialog.exec()
+
+    def on_category_change(self, item):
+        print(item.text(0))
+
+    def on_category_selection(self, item):
+        if item:
+            print(item.text(0))
 
     def on_remove_category_clicked(self, dialog):
         selected_item = dialog.treeWidget.currentItem()
@@ -139,6 +153,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         month_sum = 0
 
         for row in range(self.tableWidget.rowCount()):
+            if not self.tableWidget.item(row, 0) or not self.tableWidget.item(row, 1):
+                continue
             date_str = self.tableWidget.item(row, 0).text()
             cost_str = self.tableWidget.item(row, 1).text()
             cost_val = float(cost_str)

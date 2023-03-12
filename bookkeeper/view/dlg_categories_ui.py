@@ -102,10 +102,11 @@ class Dialog_Categories(QDialog):
 
     def populate(self, cats):
         known_parents = {}
-        for (name, parent) in cats:
+        for (name, parent) in cats:s
             if parent:
                 parent_item = known_parents[parent]
-                child_item = QTreeWidgetItem(parent_item, [name])
-                known_parents[name] = child_item
+                item = QTreeWidgetItem(parent_item, [name])
             else:
-                known_parents[name] = QTreeWidgetItem(self.treeWidget, [name])
+                item = QTreeWidgetItem(self.treeWidget, [name])
+            item.setFlags(item.flags() | Qt.ItemIsEditable)
+            known_parents[name] = item
