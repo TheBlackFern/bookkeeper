@@ -7,11 +7,12 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QDialog,
     QTableWidgetItem,
+    QMessageBox,
 )
 
 from bookkeeper.view.main_window_ui import Ui_MainWindow
-from bookkeeper.view.dlg_budget_ui import Ui_Dialog_Budget
 from bookkeeper.view.dlg_categories_ui import Ui_Dialog_Categories
+from bookkeeper.view.dlg_budget_ui import Dialog_Budget
 from bookkeeper.view.dlg_category_ui import Dialog_Category
 from bookkeeper.view.dlg_expense_ui import Dialog_Expense
 from bookkeeper.utils import read_tree
@@ -33,21 +34,9 @@ from bookkeeper.models.budget import Budget
 #     self.setLayout(self.layout)
 
 
-class BudgetDlg(QDialog, Ui_Dialog_Budget):
-    def __init__(self):
-        super(BudgetDlg, self).__init__()
-
-
 class CategoriesDlg(QDialog, Ui_Dialog_Categories):
     def __init__(self):
         super(CategoriesDlg, self).__init__()
-
-
-# class ExpenseDlg(QDialog):
-#     def __init__(self):
-#         super().__init__()
-#         self.ui = Ui_Dialog_Expense()
-#         self.ui.setupUi(self)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -77,7 +66,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ...
 
     def on_change_budget_clicked(self):
-        ...
+        dialog = Dialog_Budget()
+        dialog.buttonBox.accepted.connect(
+            lambda: self.change_budget(
+                dialog,
+                dialog.setDayBudgetLine.text(),
+                dialog.setWeekBudgetLine.text(),
+                dialog.setMonthBudgetLine.text(),
+            )
+        )
+        dialog.exec()
+
+    def change_budget(self, dialog, day: str, week: str, month: str):
+        day_sum = float(day) if day else self._bugdet_day.amount
+        week_sum = float(week) if week else self._bugdet_week.amount
+        month_sum = float(month) if month else self._bugdet_month.amount
+        try:
+            assert day_sum >= 0
+            assert week_sum >= 0
+            assert month_sum >= 0
+        except (ValueError, AssertionError):
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Бюджет не может быть отрицательным!")
+            msg.setWindowTitle("Ошибка")
+            msg.exec()
+            dialog.reject()
+            return
+
+        self._bugdet_day.amount = day_sum
+        self._bugdet_week.amount = week_sum
+        self._bugdet_month.amount = month_sum
+        self.update_budget()
+        dialog.accept()
 
     def set_budget_text(self, amount: float, period: str):
         budget_lables = {
@@ -132,26 +153,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def on_add_category_clicked(self):
         dialog = Dialog_Category(self._cats)
-        name_input = dialog.setNameLine
-        parent_input = dialog.selectCategoryBox
         dialog.buttonBox.accepted.connect(
-            lambda: self.add_category(name_input.text(), parent_input.currentText())
+            lambda: self.add_category(
+                dialog.setNameLine.text(), dialog.selectCategoryBox.currentText()
+            )
         )
         dialog.exec()
 
     def on_add_expense_clicked(self):
         dialog = Dialog_Expense(self._cats)
-        date_input = dialog.setDateLine
-        sum_input = dialog.setSumLine
-        category_input = dialog.selectCategoryBox
-        comment_input = dialog.setCommentLine
         dialog.buttonBox.accepted.connect(
             lambda: self.load_data(
                 [
-                    date_input.text(),
-                    sum_input.text(),
-                    category_input.currentText(),
-                    comment_input.text(),
+                    dialog.setDateLine.text(),
+                    dialog.setSumLine.text(),
+                    dialog.selectCategoryBox.currentText(),
+                    dialog.setCommentLine.text(),
                 ]
             )
         )
