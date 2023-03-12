@@ -124,6 +124,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 "border-radius: 10px;\n"
                 "color: rgb(255,0,0)"
             )
+        else:
+            current_budget_lable.setStyleSheet(
+                "background-color: rgb(255,255, 255);\n"
+                "font: 11pt;\n"
+                "border-radius: 10px;\n"
+                "color: rgb(0,0,0)"
+            )
 
     def update_budget(self):
         today = datetime.date.today()
