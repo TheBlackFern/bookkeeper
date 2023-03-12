@@ -1,4 +1,6 @@
+from functools import partial
 import sys
+from typing import Iterable
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -9,8 +11,10 @@ from PySide6.QtWidgets import (
 from bookkeeper.view.main_window_ui import Ui_MainWindow
 from bookkeeper.view.dlg_budget_ui import Ui_Dialog_Budget
 from bookkeeper.view.dlg_categories_ui import Ui_Dialog_Categories
-from bookkeeper.view.dlg_category_ui import Ui_Dialog_Category
+from bookkeeper.view.dlg_category_ui import Dialog_Category
 from bookkeeper.view.dlg_expense_ui import Dialog_Expense
+from bookkeeper.utils import read_tree
+from bookkeeper.models.budget import Budget
 
 # from bookkeeper.view.expense_widget import ExpenseWidget
 # from bookkeeper.view.table_widget import TableWidget
@@ -38,11 +42,6 @@ class CategoriesDlg(QDialog, Ui_Dialog_Categories):
         super(CategoriesDlg, self).__init__()
 
 
-class CategoryDlg(QDialog, Ui_Dialog_Category):
-    def __init__(self):
-        super(CategoryDlg, self).__init__()
-
-
 # class ExpenseDlg(QDialog):
 #     def __init__(self):
 #         super().__init__()
@@ -51,21 +50,26 @@ class CategoryDlg(QDialog, Ui_Dialog_Category):
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, data: list[list[str, str, str, str]] | None):
+    def __init__(
+        self,
+        data: list[list[str, str, str, str]] | None,
+        cats: Iterable[str] | None,
+        budgets: list[Budget],
+    ):
         super().__init__()
         self.setupUi(self)
+        self._cats = read_tree(cats) if cats else []
         self._data = data if data else []
+        self._bugdet_day = budgets[0]
+        self._bugdet_week = budgets[1]
+        self._bugdet_month = budgets[2]
         self.load_data()
+
         self.addExpenseButton.clicked.connect(self.on_add_expense_clicked)
         self.addCategoryButton.clicked.connect(self.on_add_category_clicked)
         self.changeBudgetButton.clicked.connect(self.on_change_budget_clicked)
         self.showCategoriesButton.clicked.connect(self.on_show_categories_clicked)
         self.removeExpenseButton.clicked.connect(self.on_remove_expense_clicked)
-
-    def on_remove_expense_clicked(self):
-        selected = self.tableWidget.currentRow()
-        if selected != -1:
-            self.tableWidget.removeRow(selected)
 
     def on_show_categories_clicked(self):
         ...
@@ -73,11 +77,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_change_budget_clicked(self):
         ...
 
+    def add_category(self, name: str, parent_category: str):
+        print(name, parent_category)
+        actual_parent = parent_category if parent_category != "-" else None
+        self._cats.append((name, actual_parent))
+        self.update()
+
     def on_add_category_clicked(self):
-        ...
+        dialog = Dialog_Category(self._cats)
+        name_input = dialog.setNameLine
+        parent_input = dialog.selectCategoryBox
+        dialog.buttonBox.accepted.connect(
+            lambda: self.add_category(name_input.text(), parent_input.currentText())
+        )
+        dialog.exec()
 
     def on_add_expense_clicked(self):
-        dialog = Dialog_Expense()
+        dialog = Dialog_Expense(self._cats)
         date_input = dialog.setDateLine
         sum_input = dialog.setSumLine
         category_input = dialog.selectCategoryBox
@@ -92,8 +108,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 ]
             )
         )
-        dialog.show()
         dialog.exec()
+
+    # def on_add_category_from_expense_clicked(self):
+    #     self.dlg_expense.hide()
+    #     self.dlg_category_from_expense.show()
+
+    # def add_category_from_expense(self, name: str, parent_category: str):
+    #     actual_parent = parent_category if parent_category != "-" else None
+    #     self._cats.append((name, actual_parent))
+    #     self.on_add_expense_clicked()
+    #     self.update()
+
+    def on_remove_expense_clicked(self):
+        selected = self.tableWidget.currentRow()
+        if selected != -1:
+            self.tableWidget.removeRow(selected)
 
     def load_data(self, expense=None):
         if expense:
@@ -106,6 +136,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.tableWidget.setItem(row_num, 3, QTableWidgetItem(row[3]))
         self.update()
 
+
+cats = """
+продукты
+    мясо
+        сырое мясо
+        мясные продукты
+    сладости
+книги
+одежда
+""".splitlines()
 
 data = [
     row.strip().split("|")
@@ -136,6 +176,6 @@ data = [
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow(data)
+    window = MainWindow(data, cats)
     window.show()
     app.exec()

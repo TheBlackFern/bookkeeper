@@ -1,5 +1,5 @@
 """
-Вспомогательные функции
+Utilitary fucntions
 """
 
 from typing import Iterable, Iterator
@@ -18,29 +18,28 @@ def _lines_with_indent(lines: Iterable[str]) -> Iterator[tuple[int, str]]:
 
 def read_tree(lines: Iterable[str]) -> list[tuple[str, str | None]]:
     """
-    Прочитать структуру дерева из текста на основе отступов. Вернуть список
-    пар "потомок-родитель" в порядке топологической сортировки. Родитель
-    элемента верхнего уровня - None.
+    Read a tree structure from text based on indentation. Return a topologically
+    sorted list of pairs "child-parent". For the top level entries parent is None.
 
-    Пример. Следующий текст:
+    Example. This text:
     parent
         child1
             child2
         child3
 
-    даст такое дерево:
+    would result in this tree:
     [('parent', None), ('child1', 'parent'),
      ('child2', 'child1'), ('child3', 'parent')]
 
-    Пустые строки игнорируются.
+    Empty lines are ignored
 
     Parameters
     ----------
-    lines - Итерируемый объект, содержащий строки текста (файл или список строк)
+    lines - An iterable object that contains lines of text (a file or a list of str)
 
     Returns
     -------
-    Список пар "потомок-родитель"
+    "Child-parent" pairs list
     """
     parents: list[tuple[str | None, int]] = []
     last_indent = -1
@@ -54,8 +53,8 @@ def read_tree(lines: Iterable[str]) -> list[tuple[str, str | None]]:
                 _, last_indent = parents.pop()
             if indent != last_indent:
                 raise IndentationError(
-                    f'unindent does not match any outer indentation'
-                    f'level in line {i}:\n'
+                    f"unindent does not match any outer indentation"
+                    f"level in line {i}:\n"
                 )
         result.append((name, parents[-1][0]))
         last_name = name
