@@ -230,6 +230,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         selected = self.tableWidget.currentRow()
         if selected != -1:
             self.tableWidget.removeRow(selected)
+            self.update_budget()
 
     def load_data(self, expense=None):
         if expense:
