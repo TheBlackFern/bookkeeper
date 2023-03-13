@@ -1,11 +1,9 @@
 import sys
 import datetime
-from typing import Iterable
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QDialog,
     QTableWidgetItem,
     QMessageBox,
     QTreeWidgetItem,
@@ -16,51 +14,41 @@ from bookkeeper.view.dlg_categories_ui import Dialog_Categories
 from bookkeeper.view.dlg_budget_ui import Dialog_Budget
 from bookkeeper.view.dlg_category_ui import Dialog_Category
 from bookkeeper.view.dlg_expense_ui import Dialog_Expense
-from bookkeeper.utils import read_tree
 from bookkeeper.models.budget import Budget
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.category import Category
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
 
-# from bookkeeper.view.expense_widget import ExpenseWidget
-# from bookkeeper.view.table_widget import TableWidget
-
-# Dialog windows for later
-
-# class CustomDialog(QDialog):
-#     self.buttonBox = QDialogButtonBox(QBtn)
-#     self.buttonBox.accepted.connect(self.accept)
-#     self.buttonBox.rejected.connect(self.reject)
-#     self.layout = QVBoxLayout()
-#     message = QLabel("Something happened, is that OK?")
-#     self.layout.addWidget(message)
-#     self.layout.addWidget(self.buttonBox)
-#     self.setLayout(self.layout)
-
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    """
+    The main window of an app, also sets interaction logic for all elements
+    and databases.
+    """
+
     def __init__(
         self,
         data_db: SQLiteRepository[Expense],
         cats_db: SQLiteRepository[Category],
-        budgets: list[Budget],
+        budget_db: SQLiteRepository[Budget],
     ):
         super().__init__()
         self.setupUi(self)
         self._data_db = data_db
         self._cats_db = cats_db
+        self._budget_db = budget_db
         self._cats = []
         self._expenses_map_to_pk = {}
         self._cats_map_to_pk = {}
         self._cats_map_to_widget = {}
         self._pk_map_to_cats = {}
         self._pk_map_to_expenses = {}
-        self._bugdet_day = budgets[0]
-        self._bugdet_week = budgets[1]
-        self._bugdet_month = budgets[2]
+        self._bugdet_day = budget_db.get(1)
+        self._bugdet_week = budget_db.get(2)
+        self._bugdet_month = budget_db.get(3)
         self._last_selected_item_text = ""
         self._last_selected_category_text = ""
-        self.load_data()
+        self.populate_table()
         self.get_cats_from_db()
         self.update_budget()
 
@@ -72,10 +60,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.itemChanged.connect(self.on_expense_change)
         self.tableWidget.itemClicked.connect(self.on_expense_selection)
 
-    def on_add_expense_clicked(self):
+    def on_add_expense_clicked(self) -> None:
+        """
+        Pop up a widget for adding in an expense.
+        """
         dialog = Dialog_Expense(self._cats)
         dialog.buttonBox.accepted.connect(
-            lambda: self.load_data(
+            lambda: self.populate_table(
                 (
                     dialog.setDateLine.text(),
                     dialog.setSumLine.text(),
@@ -86,7 +77,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         dialog.exec()
 
-    def on_add_category_clicked(self):
+    def on_add_category_clicked(self) -> None:
+        """
+        Pop up a widget for adding in a category.
+        """
         dialog = Dialog_Category(self._cats)
         dialog.buttonBox.accepted.connect(
             lambda: self.add_category(
@@ -97,7 +91,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         dialog.exec()
 
-    def on_change_budget_clicked(self):
+    def on_change_budget_clicked(self) -> None:
+        """
+        Pop up a widget for changing the budget.
+        """
         dialog = Dialog_Budget()
         dialog.buttonBox.accepted.connect(
             lambda: self.change_budget(
@@ -109,9 +106,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         dialog.exec()
 
-    def on_show_categories_clicked(self):
+    def on_show_categories_clicked(self) -> None:
+        """
+        Pop up a widget with a categories tree.
+        """
         dialog = Dialog_Categories()
-        self.populate(dialog)
+        self.populate_tree(dialog)
         dialog.treeWidget.itemChanged.connect(self.on_category_change)
         dialog.treeWidget.itemClicked.connect(self.on_category_selection)
         dialog.removeCategoryButton.clicked.connect(
@@ -119,7 +119,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         dialog.exec()
 
-    def on_remove_expense_clicked(self):
+    def on_remove_expense_clicked(self) -> None:
+        """
+        Remove an expense from a table and from database.
+        """
         selected = self.tableWidget.currentRow()
         if selected != -1:
             self.tableWidget.removeRow(selected)
@@ -127,7 +130,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update()
             self.update_budget()
 
-    def on_remove_category_clicked(self, dialog):
+    def on_remove_category_clicked(self, dialog: Dialog_Categories) -> None:
+        """
+        Remove a category, all of its sub-categories, all of expenses that are
+        related to all these categories and all of the respective database entries.
+        An expense cannot have a None category, so removing all expenses is forced.
+        """
         selected_item = dialog.treeWidget.currentItem()
         if selected_item:
             parent_item = selected_item.parent()
@@ -153,11 +161,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self._data_db.delete(exp.pk)
             self._cats_db.delete(cat.pk)
             self.get_cats_from_db()
-            self.load_data()
+            self.populate_table()
             self.update_budget()
             self.update()
 
-    def on_expense_change(self, item):
+    def on_expense_change(self, item: QTableWidgetItem) -> None:
+        """
+        Update an expense and its database entry, if it's a valid edit.
+        """
         if (
             not self.tableWidget.item(item.row(), 0)
             or not self.tableWidget.item(item.row(), 1)
@@ -194,12 +205,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.update_budget()
 
-    def on_expense_selection(self, item):
+    def on_expense_selection(self, item: QTableWidgetItem | None)-> None:
+        """"
+        Constant monitoring of selected table entries, for the cases when
+        the entry text is changed, but the change is flawed and we have
+        to undo it (for example, when the sum was changed to a negative number).
+        """
         if item:
             self._last_selected_item_text = item.text()
             print(self._last_selected_item_text)
 
-    def on_category_change(self, item):
+    def on_category_change(self, item: QTreeWidgetItem) -> None:
+        """
+        Update the category, it's database entry and all of the entries, if it's 
+        a valid edit.
+        """
         cats = [name for (name, _) in self._cats]
         if item.text(0) in cats:
             throw_error("Категория с таким именем уже существует!")
@@ -219,12 +239,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print(item.text(0))
         self.update()
 
-    def on_category_selection(self, item):
+    def on_category_selection(self, item: QTreeWidgetItem | None) -> None:
+        """"
+        Constant monitoring of selected categories, for the cases when
+        the category text is changed, but the change is flawed and we have
+        to undo it (for example, when the name was changed to an already 
+        existing one).
+        """
         if item:
             self._last_selected_category_text = item.text(0)
             print(self._last_selected_category_text)
 
-    def change_budget(self, dialog, day: str, week: str, month: str):
+    def change_budget(self, dialog: Dialog_Budget, day: str, week: str, month: str) -> None:
+        """
+        Change budget with the numbers given (in string format).
+        """
+        # they never are
+        assert self._bugdet_day is not None
+        assert self._bugdet_week is not None
+        assert self._bugdet_month is not None
         day_sum = float(day) if day else self._bugdet_day.amount
         week_sum = float(week) if week else self._bugdet_week.amount
         month_sum = float(month) if month else self._bugdet_month.amount
@@ -240,10 +273,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._bugdet_day.amount = day_sum
         self._bugdet_week.amount = week_sum
         self._bugdet_month.amount = month_sum
+        self._budget_db.update(self._bugdet_day)
+        self._budget_db.update(self._bugdet_week)
+        self._budget_db.update(self._bugdet_month)
         self.update_budget()
         dialog.accept()
 
-    def set_budget_text(self, amount: float, period: str):
+    def set_budget_text(self, amount: float, period: str) -> None:
+        """
+        Set the text inside the budget widget to display current budget status.
+        It would look like " current spent / budget sum ".
+        """
+        # they never are
+        assert self._bugdet_day is not None
+        assert self._bugdet_week is not None
+        assert self._bugdet_month is not None
         budget_lables = {
             "day": (self.lableBudgetDay, self._bugdet_day),
             "week": (self.lableBudgetWeek, self._bugdet_week),
@@ -267,7 +311,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 "color: rgb(0,0,0)"
             )
 
-    def update_budget(self):
+    def update_budget(self) -> None:
+        """
+        Update all budgets for possible changes.
+        """
         today = datetime.date.today()
         today_sum = 0
         week_sum = 0
@@ -298,7 +345,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_budget_text(week_sum, "week")
         self.set_budget_text(month_sum, "month")
 
-    def add_category(self, dialog, name: str, parent_category: str):
+    def add_category(self, dialog: Dialog_Expense, name: str, parent_category: str) -> None:
+        """
+        Add category to the database if a category with the same name doesn't exist.
+        """
         cat_names = {name for (name, _) in self._cats}
         if name in cat_names:
             throw_error("Категория с таким именем уже существует!")
@@ -315,17 +365,63 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update()
         dialog.accept()
 
-    # def on_add_category_from_expense_clicked(self):
-    #     self.dlg_expense.hide()
-    #     self.dlg_category_from_expense.show()
+    def _validate_expense(
+        self,
+        date: str = datetime.date.today().strftime("%Y-%m-%d"),
+        amount: str = "100",
+        cat: str | None = None,
+    ) -> bool:
+        """
+        Check if proposed parameters are suitable for an expense.
+        Date should be in YYYY-MM-DD format.
+        Amount should be a non-negative real number.
+        Category should be from existing categories.
+        """
+        try:
+            assert datetime.date.fromisoformat(date)
+        except ValueError:
+            throw_error("Неверный формат даты!")
+            return False
+        try:
+            assert float(amount) >= 0
+        except AssertionError:
+            throw_error("Сумма не может быть отрицательной!")
+            return False
+        try:
+            if cat is None:
+                return True
+            cat_names = [name for (name, _) in self._cats]
+            assert cat in cat_names
+        except AssertionError:
+            throw_error("Категории не существует!")
+            return False
+        return True
 
-    # def add_category_from_expense(self, name: str, parent_category: str):
-    #     actual_parent = parent_category if parent_category != "-" else None
-    #     self._cats.append((name, actual_parent))
-    #     self.on_add_expense_clicked()
-    #     self.update()
+    def get_cats_from_db(self) -> None:
+        """
+        Get category an its heirarchy from the database.
+        """
+        cats = self._cats_db.get_all_where()
+        print(cats)
+        if cats:
+            self._cats_map_to_pk = {}
+            self._pk_map_to_cats = {}
+            for cat in cats:
+                self._cats_map_to_pk[cat.name] = cat.pk
+                self._pk_map_to_cats[cat.pk] = cat.name
+            self._cats = []
+            for cat in cats:
+                if cat.parent:
+                    self._cats.append((cat.name, self._pk_map_to_cats[cat.parent]))
+                else:
+                    self._cats.append((cat.name, None))
+        self.update()
 
-    def load_data(self, expense: tuple[str, str, str, str] | None = None):
+    def populate_table(self, expense: tuple[str, str, str, str] | None = None) -> None:
+        """
+        Populate the table widget with expenses from a database. Possibly add a new
+        expense.
+        """
         if expense:
             if self._validate_expense(
                 date=expense[0], amount=expense[1], cat=expense[2]
@@ -354,50 +450,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_budget()
         self.update()
 
-    def _validate_expense(
-        self,
-        date: str = datetime.date.today().strftime("%Y-%m-%d"),
-        amount: str = "100",
-        cat: str | None = None,
-    ) -> bool:
-        try:
-            assert datetime.date.fromisoformat(date)
-        except ValueError:
-            throw_error("Неверный формат даты!")
-            return False
-        try:
-            assert float(amount) >= 0
-        except AssertionError:
-            throw_error("Сумма не может быть отрицательной!")
-            return False
-        try:
-            if cat is None:
-                return True
-            cat_names = [name for (name, _) in self._cats]
-            assert cat in cat_names
-        except AssertionError:
-            throw_error("Категории не существует!")
-            return False
-        return True
-
-    def get_cats_from_db(self):
-        cats = self._cats_db.get_all_where()
-        print(cats)
-        if cats:
-            self._cats_map_to_pk = {}
-            self._pk_map_to_cats = {}
-            for cat in cats:
-                self._cats_map_to_pk[cat.name] = cat.pk
-                self._pk_map_to_cats[cat.pk] = cat.name
-            self._cats = []
-            for cat in cats:
-                if cat.parent:
-                    self._cats.append((cat.name, self._pk_map_to_cats[cat.parent]))
-                else:
-                    self._cats.append((cat.name, None))
-        self.update()
-
-    def populate(self, dialog):
+    def populate_tree(self, dialog: Dialog_Categories) -> None:
+        """
+        Populate the tree widget with categories from a database.
+        """
         known_parents = {}
         self._cats_map_to_widget = {}
         for (name, parent) in self._cats:
@@ -411,7 +467,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._cats_map_to_widget[name] = item
 
 
-def throw_error(text: str):
+def throw_error(text: str) -> None:
+    """
+    Create an error pop with a message.
+    """
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
     msg.setText(text)
@@ -420,64 +479,11 @@ def throw_error(text: str):
 
 
 if __name__ == "__main__":
-    # cats = """
-    # продукты
-    #     хлеб
-    #     молочные
-    #         молоко
-    #         кефир
-    #         сыр
-    #         сметана
-    #     мясо
-    #         сырое мясо
-    #         мясные продукты
-    #     сладости
-    #     рыба
-    #     фрукты
-    #     овощи
-    #     крупы
-    #     макароны
-    # хозтовары
-    # книги
-    # одежда
-    # телефон
-    # """.splitlines()
-
-    # data = [
-    #     row.strip().split("|")
-    #     for row in """
-    #         2023-03-12|144.99|продукты|чипсы
-    #         2023-03-09|7.49|хозтовары|пакет на кассе
-    #         2023-03-09|104.99|кефир|
-    #         2023-03-09|129.99|хлеб|
-    #         2023-03-09|239.98|сладости|пряники|
-    #         2023-03-09|139.99|сыр|
-    #         2023-03-09|82.99|сметана|
-    #         2023-03-06|5536.00|книги|книги по Python и PyQt
-    #         2023-03-05|478.00|телефон|
-    #         2023-03-03|78.00|продукты|
-    #         2023-03-03|1112.00|рыба|
-    #         2023-03-03|1008.00|рыба|
-    #         2023-03-03|156.00|рыба|
-    #         2023-03-03|168.00|сладости|
-    #         2023-03-03|236.73|фрукты|
-    #         2023-03-03|16.00|хозтовары|
-    #         2023-03-03|259.73|книги|
-    #         2023-03-03|119.86|хлеб|
-    #         2023-03-03|159.82|крупы|
-    #         2023-03-03|79.91|макароны|
-    #         2023-03-03|479.48|овощи|
-    #     """.strip().splitlines()
-    # ]
-    db_name = "databases/sql.db"
-    expense_db = SQLiteRepository[Expense](db_name, Expense)
-    category_db = SQLiteRepository[Category](db_name, Category)
-    budget_db = SQLiteRepository[Budget](db_name, Budget)
-    day_budget = Budget(1000.00)
-    week_budget = Budget(7000.00)
-    month_budget = Budget(30000.00)
-    bdgts = [day_budget, week_budget, month_budget]
+    DB_NAME = "databases/sql.db"
+    expenses_db = SQLiteRepository[Expense](DB_NAME, Expense)
+    categories_db = SQLiteRepository[Category](DB_NAME, Category)
+    budgets_db = SQLiteRepository[Budget](DB_NAME, Budget)
     app = QApplication(sys.argv)
-    window = MainWindow(expense_db, category_db, bdgts)
+    window = MainWindow(expenses_db, categories_db, budgets_db)
     window.show()
     app.exec()
