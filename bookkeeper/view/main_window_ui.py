@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'bookkeeper.ui'
-##
-## Created by: Qt User Interface Compiler version 6.4.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
+"""
+Main window UI class module.
+"""
 
 from PySide6.QtCore import (
     QCoreApplication,
@@ -56,12 +50,13 @@ from PySide6.QtWidgets import (
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        if not MainWindow.objectName():
-            MainWindow.setObjectName("MainWindow")
+
         MainWindow.resize(530, 798)
+
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tableWidget = QTableWidget(self.centralwidget)
+
         if self.tableWidget.columnCount() < 4:
             self.tableWidget.setColumnCount(4)
         __qtablewidgetitem = QTableWidgetItem()
@@ -71,13 +66,13 @@ class Ui_MainWindow(object):
         __qtablewidgetitem2 = QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
+
         self.tableWidget.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setGeometry(QRect(10, 50, 511, 601))
         self.tableWidget.setMinimumSize(QSize(450, 351))
         self.tableWidget.setAutoFillBackground(False)
         self.tableWidget.setStyleSheet("")
-        self.tableWidget.setLocale(QLocale(QLocale.Russian, QLocale.Russia))
         self.tableWidget.setGridStyle(Qt.SolidLine)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(90)
@@ -207,113 +202,24 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-
-        QMetaObject.connectSlotsByName(MainWindow)
-
-    # setupUi
-
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(
-            QCoreApplication.translate("MainWindow", "MainWindow", None)
-        )
+        MainWindow.setWindowTitle("Бухгалтер, милый мой бухгалтер")
         ___qtablewidgetitem = self.tableWidget.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(
-            QCoreApplication.translate("MainWindow", "\u0414\u0430\u0442\u0430", None)
-        )
+        ___qtablewidgetitem.setText("Дата")
         ___qtablewidgetitem1 = self.tableWidget.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(
-            QCoreApplication.translate(
-                "MainWindow", "\u0421\u0443\u043c\u043c\u0430", None
-            )
-        )
+        ___qtablewidgetitem1.setText("Сумма")
         ___qtablewidgetitem2 = self.tableWidget.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(
-            QCoreApplication.translate(
-                "MainWindow",
-                "\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f",
-                None,
-            )
-        )
+        ___qtablewidgetitem2.setText("Категория")
         ___qtablewidgetitem3 = self.tableWidget.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(
-            QCoreApplication.translate(
-                "MainWindow",
-                "\u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439",
-                None,
-            )
-        )
-        self.addCategoryButton.setText(
-            QCoreApplication.translate(
-                "MainWindow",
-                "\u041d\u043e\u0432\u0430\u044f \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f",
-                None,
-            )
-        )
-        self.showCategoriesButton.setText(
-            QCoreApplication.translate(
-                "MainWindow",
-                "\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438...",
-                None,
-            )
-        )
-        self.removeExpenseButton.setText(
-            QCoreApplication.translate(
-                "MainWindow", "\u0423\u0434\u0430\u043b\u0438\u0442\u044c", None
-            )
-        )
-        self.changeBudgetButton.setText(
-            QCoreApplication.translate(
-                "MainWindow", "\u0411\u044e\u0434\u0436\u0435\u0442", None
-            )
-        )
-        # if QT_CONFIG(whatsthis)
-        self.lableBudgetDay.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow", "<html><head/><body><p><br/></p></body></html>", None
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.lableBudgetDay.setText(
-            QCoreApplication.translate("MainWindow", "TextLabel", None)
-        )
-        self.addExpenseButton.setText(
-            QCoreApplication.translate(
-                "MainWindow", "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c", None
-            )
-        )
-        self.label.setText(
-            QCoreApplication.translate("MainWindow", "\u0414\u0435\u043d\u044c", None)
-        )
-        self.label_2.setText(
-            QCoreApplication.translate(
-                "MainWindow", "\u041d\u0435\u0434\u0435\u043b\u044f", None
-            )
-        )
-        # if QT_CONFIG(whatsthis)
-        self.lableBudgetWeek.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow", "<html><head/><body><p><br/></p></body></html>", None
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.lableBudgetWeek.setText(
-            QCoreApplication.translate("MainWindow", "TextLable", None)
-        )
-        # if QT_CONFIG(whatsthis)
-        self.lableBudgetMonth.setWhatsThis(
-            QCoreApplication.translate(
-                "MainWindow", "<html><head/><body><p><br/></p></body></html>", None
-            )
-        )
-        # endif // QT_CONFIG(whatsthis)
-        self.lableBudgetMonth.setText(
-            QCoreApplication.translate("MainWindow", "TextLable", None)
-        )
-        self.label_3.setText(
-            QCoreApplication.translate(
-                "MainWindow", "\u041c\u0435\u0441\u044f\u0446", None
-            )
-        )
+        ___qtablewidgetitem3.setText("Комментарий")
+        self.addExpenseButton.setText("Добавить")
+        self.removeExpenseButton.setText("Удалить")
+        self.addCategoryButton.setText("Новая категория")
+        self.showCategoriesButton.setText("Категории...")
+        self.changeBudgetButton.setText("Бюджет")
 
-    # retranslateUi
+        self.lableBudgetDay.setText("...")
+        self.lableBudgetWeek.setText("...")
+        self.lableBudgetMonth.setText("...")
+        self.label.setText("День")
+        self.label_2.setText("Неделя")
+        self.label_3.setText("Месяц")

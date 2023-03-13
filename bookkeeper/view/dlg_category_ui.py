@@ -1,60 +1,24 @@
-# -*- coding: utf-8 -*-
+"""
+Pop up for adding in a category class module.
+"""
 
-################################################################################
-## Form generated from reading UI file 'dialog_category.ui'
-##
-## Created by: Qt User Interface Compiler version 6.4.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
-from PySide6.QtCore import (
-    QCoreApplication,
-    QDate,
-    QDateTime,
-    QLocale,
-    QMetaObject,
-    QObject,
-    QPoint,
-    QRect,
-    QSize,
-    QTime,
-    QUrl,
-    Qt,
-)
-from PySide6.QtGui import (
-    QBrush,
-    QColor,
-    QConicalGradient,
-    QCursor,
-    QFont,
-    QFontDatabase,
-    QGradient,
-    QIcon,
-    QImage,
-    QKeySequence,
-    QLinearGradient,
-    QPainter,
-    QPalette,
-    QPixmap,
-    QRadialGradient,
-    QTransform,
-)
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QAbstractButton,
-    QApplication,
     QComboBox,
     QDialog,
     QDialogButtonBox,
     QGridLayout,
     QLabel,
     QLineEdit,
-    QSizePolicy,
-    QWidget,
 )
 
 
 class Dialog_Category(QDialog):
+    """
+    Class for a pop up for adding in a category.
+    Has two lines, for a category name and its parent category, that are all labelled.
+    """
+
     def __init__(self, cats):
         super().__init__()
         self.setWindowTitle("Добавление категории")
@@ -69,29 +33,14 @@ class Dialog_Category(QDialog):
 
         self.gridLayout.setObjectName("gridLayout")
         self.label_3.setObjectName("label_3")
-        self.label_3.setLocale(QLocale(QLocale.Russian, QLocale.Russia))
         self.label_3.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
-        self.label_3.setText(
-            QCoreApplication.translate(
-                "Dialog_Category",
-                "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435",
-                None,
-            )
-        )
+        self.label_3.setText("Название")
 
         self.setNameLine.setObjectName("setNameLine")
-        self.setNameLine.setLocale(QLocale(QLocale.Russian, QLocale.Russia))
 
         self.label_5.setObjectName("label_5")
-        self.label_5.setLocale(QLocale(QLocale.Russian, QLocale.Russia))
         self.label_5.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
-        self.label_5.setText(
-            QCoreApplication.translate(
-                "Dialog_Category",
-                "\u0420\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u0441\u043a\u0430\u044f<br>\u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f",
-                None,
-            )
-        )
+        self.label_5.setText("Родительская<br>категория")
 
         self.selectCategoryBox.setObjectName("selectCategoryBox")
         self.selectCategoryBox.addItems(["-"] + [cat for (cat, _) in cats])
