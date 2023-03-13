@@ -49,7 +49,7 @@ class RepositoryProtocol(Protocol[T]):
         """
 
     @abstractmethod
-    def get_all_where(self, where: dict[str, Any] | None = None) -> list[T]:
+    def get_all_where(self, where: dict[str, Any] | None = None) -> list[T] | None:
         """
         Get all entries that satisfy all "where" conditions, return all
         entris if where is None.
