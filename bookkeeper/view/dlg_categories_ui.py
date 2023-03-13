@@ -102,7 +102,7 @@ class Dialog_Categories(QDialog):
 
     def populate(self, cats):
         known_parents = {}
-        for (name, parent) in cats:s
+        for (name, parent) in cats:
             if parent:
                 parent_item = known_parents[parent]
                 item = QTreeWidgetItem(parent_item, [name])
