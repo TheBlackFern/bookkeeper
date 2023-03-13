@@ -55,7 +55,7 @@ from PySide6.QtWidgets import (
 
 
 class Dialog_Categories(QDialog):
-    def __init__(self, cats):
+    def __init__(self):
         super().__init__()
         self.resize(482, 515)
         self.setWindowTitle("Список категорий")
@@ -84,7 +84,6 @@ class Dialog_Categories(QDialog):
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.setGeometry(QRect(0, 40, 481, 521))
         self.treeWidget.setHeaderHidden(True)
-        self.populate(cats)
 
         self.verticalLayout.addWidget(self.treeWidget)
 
@@ -100,13 +99,3 @@ class Dialog_Categories(QDialog):
 
         self.setLayout(self.verticalLayout)
 
-    def populate(self, cats):
-        known_parents = {}
-        for (name, parent) in cats:
-            if parent:
-                parent_item = known_parents[parent]
-                item = QTreeWidgetItem(parent_item, [name])
-            else:
-                item = QTreeWidgetItem(self.treeWidget, [name])
-            item.setFlags(item.flags() | Qt.ItemIsEditable)
-            known_parents[name] = item

@@ -9,7 +9,7 @@ class Budget:
     """
     Budget for a certain for a certain period of time.
 
-    period - time period
+    amount - sum of money allocated
     pk - id in the database
     """
 

@@ -1,9 +1,7 @@
 """
 Expense class module.
 """
-
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 
 
 @dataclass(slots=True)
@@ -18,8 +16,8 @@ class Expense:
     pk - id for the repo
     """
 
-    amount: int
-    category: int
-    expense_date: datetime = field(default_factory=datetime.now)
+    expense_date: str
+    amount: str
+    category: str
     comment: str = ""
     pk: int = 0
