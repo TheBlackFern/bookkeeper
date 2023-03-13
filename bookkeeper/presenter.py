@@ -205,8 +205,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.update_budget()
 
-    def on_expense_selection(self, item: QTableWidgetItem | None)-> None:
-        """"
+    def on_expense_selection(self, item: QTableWidgetItem | None) -> None:
+        """ "
         Constant monitoring of selected table entries, for the cases when
         the entry text is changed, but the change is flawed and we have
         to undo it (for example, when the sum was changed to a negative number).
@@ -217,7 +217,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def on_category_change(self, item: QTreeWidgetItem) -> None:
         """
-        Update the category, it's database entry and all of the entries, if it's 
+        Update the category, it's database entry and all of the entries, if it's
         a valid edit.
         """
         cats = [name for (name, _) in self._cats]
@@ -243,17 +243,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update()
 
     def on_category_selection(self, item: QTreeWidgetItem | None) -> None:
-        """"
+        """ "
         Constant monitoring of selected categories, for the cases when
         the category text is changed, but the change is flawed and we have
-        to undo it (for example, when the name was changed to an already 
+        to undo it (for example, when the name was changed to an already
         existing one).
         """
         if item:
             self._last_selected_category_text = item.text(0)
             print(self._last_selected_category_text)
 
-    def change_budget(self, dialog: Dialog_Budget, day: str, week: str, month: str) -> None:
+    def change_budget(
+        self, dialog: Dialog_Budget, day: str, week: str, month: str
+    ) -> None:
         """
         Change budget with the numbers given (in string format).
         """
@@ -348,7 +350,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_budget_text(week_sum, "week")
         self.set_budget_text(month_sum, "month")
 
-    def add_category(self, dialog: Dialog_Expense, name: str, parent_category: str) -> None:
+    def add_category(
+        self, dialog: Dialog_Expense, name: str, parent_category: str
+    ) -> None:
         """
         Add category to the database if a category with the same name doesn't exist.
         """

@@ -1,5 +1,5 @@
 """
-Простой тестовый скрипт для терминала
+Simple script for the terminal.
 """
 
 from bookkeeper.models.category import Category
