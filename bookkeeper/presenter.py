@@ -1,3 +1,6 @@
+"""
+App presenter class module.
+"""
 import sys
 import datetime
 from PySide6.QtCore import Qt
@@ -220,11 +223,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Update the category, it's database entry and all of the entries, if it's
         a valid edit.
         """
+        if item.text(0) == self._last_selected_category_text:
+            return
         cats = [name for (name, _) in self._cats]
         if item.text(0) in cats:
             throw_error("Категория с таким именем уже существует!")
-            widget = self._cats_map_to_widget[item.text(0)]
-            widget.setText(self._last_selected_category_text)
+            widget = self._cats_map_to_widget[self._last_selected_category_text]
+            widget.setText(0, self._last_selected_category_text)
             return
         pk = self._cats_map_to_pk[self._last_selected_category_text]
         cat = self._cats_db.get(pk)
@@ -463,7 +468,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         known_parents = {}
         self._cats_map_to_widget = {}
-        for (name, parent) in self._cats:
+        for name, parent in self._cats:
             if parent:
                 parent_item = known_parents[parent]
                 item = QTreeWidgetItem(parent_item, [name])
