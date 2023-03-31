@@ -81,8 +81,10 @@ class Category:
                 yield from get_children(graph, x.pk)
 
         subcats = defaultdict(list)
-        for cat in repo.get_all_where():
-            subcats[cat.parent].append(cat)
+        all_cats = repo.get_all_where()
+        if all_cats:
+            for cat in all_cats:
+                subcats[cat.parent].append(cat)
         return get_children(subcats, self.pk)
 
     @classmethod

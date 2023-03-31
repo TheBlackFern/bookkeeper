@@ -12,18 +12,18 @@ from PySide6.QtWidgets import (
     QTreeWidgetItem,
 )
 
-from bookkeeper.view.main_window_ui import Ui_MainWindow
-from bookkeeper.view.dlg_categories_ui import Dialog_Categories
-from bookkeeper.view.dlg_budget_ui import Dialog_Budget
-from bookkeeper.view.dlg_category_ui import Dialog_Category
-from bookkeeper.view.dlg_expense_ui import Dialog_Expense
+from bookkeeper.view.main_window_ui import UIMainWindow
+from bookkeeper.view.dlg_categories_ui import DialogCategories
+from bookkeeper.view.dlg_budget_ui import DialogBudget
+from bookkeeper.view.dlg_category_ui import DialogCategory
+from bookkeeper.view.dlg_expense_ui import DialogExpense
 from bookkeeper.models.budget import Budget
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.category import Category
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
 
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, UIMainWindow):
     """
     The main window of an app, also sets interaction logic for all elements
     and databases.
@@ -40,12 +40,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._data_db = data_db
         self._cats_db = cats_db
         self._budget_db = budget_db
-        self._cats = []
-        self._expenses_map_to_pk = {}
-        self._cats_map_to_pk = {}
-        self._cats_map_to_widget = {}
-        self._pk_map_to_cats = {}
-        self._pk_map_to_expenses = {}
+        self._cats: list[tuple[str, str | None]] = []
+        self._expenses_map_to_pk: dict[int, int] = {}
+        self._cats_map_to_pk: dict[str, int] = {}
+        self._cats_map_to_widget: dict[str, QTreeWidgetItem] = {}
+        self._pk_map_to_cats: dict[int, str] = {}
+        self._pk_map_to_expenses: dict[int, int] = {}
         self._bugdet_day = budget_db.get(1)
         self._bugdet_week = budget_db.get(2)
         self._bugdet_month = budget_db.get(3)
@@ -55,20 +55,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.get_cats_from_db()
         self.update_budget()
 
-        self.addExpenseButton.clicked.connect(self.on_add_expense_clicked)
-        self.addCategoryButton.clicked.connect(self.on_add_category_clicked)
-        self.changeBudgetButton.clicked.connect(self.on_change_budget_clicked)
-        self.showCategoriesButton.clicked.connect(self.on_show_categories_clicked)
-        self.removeExpenseButton.clicked.connect(self.on_remove_expense_clicked)
-        self.tableWidget.itemChanged.connect(self.on_expense_change)
-        self.tableWidget.itemClicked.connect(self.on_expense_selection)
+        self.addExpenseButton.clicked.connect(self.on_add_expense_clicked) # type: ignore[attr-defined]
+        self.addCategoryButton.clicked.connect(self.on_add_category_clicked) # type: ignore[attr-defined]
+        self.changeBudgetButton.clicked.connect(self.on_change_budget_clicked) # type: ignore[attr-defined]
+        self.showCategoriesButton.clicked.connect(self.on_show_categories_clicked) # type: ignore[attr-defined]
+        self.removeExpenseButton.clicked.connect(self.on_remove_expense_clicked) # type: ignore[attr-defined]
+        self.tableWidget.itemChanged.connect(self.on_expense_change) # type: ignore[attr-defined]
+        self.tableWidget.itemClicked.connect(self.on_expense_selection) # type: ignore[attr-defined]
 
     def on_add_expense_clicked(self) -> None:
         """
         Pop up a widget for adding in an expense.
         """
-        dialog = Dialog_Expense(self._cats)
-        dialog.buttonBox.accepted.connect(
+        dialog = DialogExpense(self._cats)
+        dialog.buttonBox.accepted.connect( # type: ignore[attr-defined]
             lambda: self.populate_table(
                 (
                     dialog.setDateLine.text(),
@@ -84,8 +84,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Pop up a widget for adding in a category.
         """
-        dialog = Dialog_Category(self._cats)
-        dialog.buttonBox.accepted.connect(
+        dialog = DialogCategory(self._cats)
+        dialog.buttonBox.accepted.connect( # type: ignore[attr-defined]
             lambda: self.add_category(
                 dialog,
                 dialog.setNameLine.text(),
@@ -98,8 +98,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Pop up a widget for changing the budget.
         """
-        dialog = Dialog_Budget()
-        dialog.buttonBox.accepted.connect(
+        dialog = DialogBudget()
+        dialog.buttonBox.accepted.connect( # type: ignore[attr-defined]
             lambda: self.change_budget(
                 dialog,
                 dialog.setDayBudgetLine.text(),
@@ -113,11 +113,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Pop up a widget with a categories tree.
         """
-        dialog = Dialog_Categories()
+        dialog = DialogCategories()
         self.populate_tree(dialog)
-        dialog.treeWidget.itemChanged.connect(self.on_category_change)
-        dialog.treeWidget.itemClicked.connect(self.on_category_selection)
-        dialog.removeCategoryButton.clicked.connect(
+        dialog.treeWidget.itemChanged.connect(self.on_category_change) # type: ignore[attr-defined]
+        dialog.treeWidget.itemClicked.connect(self.on_category_selection) # type: ignore[attr-defined]
+        dialog.removeCategoryButton.clicked.connect( # type: ignore[attr-defined]
             lambda: self.on_remove_category_clicked(dialog)
         )
         dialog.exec()
@@ -133,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update()
             self.update_budget()
 
-    def on_remove_category_clicked(self, dialog: Dialog_Categories) -> None:
+    def on_remove_category_clicked(self, dialog: DialogCategories) -> None:
         """
         Remove a category, all of its sub-categories, all of expenses that are
         related to all these categories and all of the respective database entries.
@@ -259,7 +259,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print(self._last_selected_category_text)
 
     def change_budget(
-        self, dialog: Dialog_Budget, day: str, week: str, month: str
+        self, dialog: DialogBudget, day: str, week: str, month: str
     ) -> None:
         """
         Change budget with the numbers given (in string format).
@@ -326,9 +326,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Update all budgets for possible changes.
         """
         today = datetime.date.today()
-        today_sum = 0
-        week_sum = 0
-        month_sum = 0
+        today_sum = 0.0
+        week_sum = 0.0
+        month_sum = 0.0
 
         for row in range(self.tableWidget.rowCount()):
             if not self.tableWidget.item(row, 0) or not self.tableWidget.item(row, 1):
@@ -356,7 +356,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_budget_text(month_sum, "month")
 
     def add_category(
-        self, dialog: Dialog_Expense, name: str, parent_category: str
+        self, dialog: DialogCategory, name: str, parent_category: str
     ) -> None:
         """
         Add category to the database if a category with the same name doesn't exist.
@@ -462,11 +462,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_budget()
         self.update()
 
-    def populate_tree(self, dialog: Dialog_Categories) -> None:
+    def populate_tree(self, dialog: DialogCategories) -> None:
         """
         Populate the tree widget with categories from a database.
         """
-        known_parents = {}
+        known_parents: dict[str, QTreeWidgetItem] = {}
         self._cats_map_to_widget = {}
         for name, parent in self._cats:
             if parent:
@@ -474,7 +474,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item = QTreeWidgetItem(parent_item, [name])
             else:
                 item = QTreeWidgetItem(dialog.treeWidget, [name])
-            item.setFlags(item.flags() | Qt.ItemIsEditable)
+            item.setFlags(item.flags() | Qt.ItemIsEditable) # type: ignore[attr-defined]
             known_parents[name] = item
             self._cats_map_to_widget[name] = item
 
@@ -484,7 +484,7 @@ def throw_error(text: str) -> None:
     Create an error pop with a message.
     """
     msg = QMessageBox()
-    msg.setIcon(QMessageBox.Critical)
+    msg.setIcon(QMessageBox.Critical) # type: ignore[attr-defined]
     msg.setText(text)
     msg.setWindowTitle("Ошибка")
     msg.exec()

@@ -3,26 +3,25 @@ SQLite repository class module.
 """
 import sqlite3
 from inspect import get_annotations
-from typing import Generic, Any
+from typing import Generic, Type, Any
 
 from bookkeeper.repository.abstract_repository import T
-
 
 class SQLiteRepository(Generic[T]):
     """
     Repository that works with an SQLite database.
     """
 
-    def __init__(self, db_name: str, entry_cls: type) -> None:
+    def __init__(self, db_name: str, entry_class: Type[T]) -> None:
         self.db_name = db_name
+        self.entry_cls = entry_class
         self.table_name = (
-            entry_cls.__name__.lower()
-        )  # but what if class name is "'; DELETE FROM TABLE" 👀
-        self.fields = get_annotations(entry_cls, eval_str=True)
+            self.entry_cls.__name__.lower()
+        )  # but what if class name is "'; DROP TABLE" 👀
+        self.fields = get_annotations(self.entry_cls, eval_str=True)
         self.fields.pop("pk")
         self.fields_str = ", ".join(self.fields.keys())
         self.fields_with_marks = ", ".join([f"{name}=?" for name in self.fields.keys()])
-        self.entry_cls = entry_cls
         self._create_table()
 
     def _create_table(self) -> None:
@@ -52,7 +51,9 @@ class SQLiteRepository(Generic[T]):
                 values,
             )
             pk = cur.lastrowid
-            assert pk is not None # something must go terribly wrong for this not to be the case
+            assert (
+                pk is not None
+            )  # something must go terribly wrong for this not to be the case
             obj.pk = pk
         con.close()
         return obj.pk

@@ -32,7 +32,7 @@ def fixture_repository(custom_class):
     os.remove(db_path)
     temp = open(db_path, "a", encoding="utf-8")
     temp.close()
-    return SQLiteRepository(db_name=db_path, entry_cls=custom_class)
+    return SQLiteRepository[custom_class](db_path, custom_class)
 
 
 def test_crud(repo: SQLiteRepository, custom_class):

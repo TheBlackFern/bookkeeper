@@ -8,6 +8,7 @@ from PySide6.QtCore import (
     Qt,
 )
 from PySide6.QtWidgets import (
+    QMainWindow,
     QLabel,
     QPushButton,
     QSizePolicy,
@@ -18,8 +19,12 @@ from PySide6.QtWidgets import (
 )
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+class UIMainWindow(object):
+    """
+    Class for UI structure of the main window.
+    """
+    def setupUi(self, MainWindow: QMainWindow) -> None:
+        """Setup the UI of the main window."""
 
         MainWindow.resize(530, 798)
 
@@ -43,7 +48,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setMinimumSize(QSize(450, 351))
         self.tableWidget.setAutoFillBackground(False)
         self.tableWidget.setStyleSheet("")
-        self.tableWidget.setGridStyle(Qt.SolidLine)
+        self.tableWidget.setGridStyle(Qt.SolidLine) # type: ignore[attr-defined]
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(90)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
@@ -51,7 +56,7 @@ class Ui_MainWindow(object):
         self.addCategoryButton = QPushButton(self.centralwidget)
         self.addCategoryButton.setObjectName("addCategoryButton")
         self.addCategoryButton.setGeometry(QRect(250, 10, 151, 31))
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed) # type: ignore[attr-defined]
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
@@ -118,7 +123,7 @@ class Ui_MainWindow(object):
             "font: 11pt;\n"
             "border-radius: 10px"
         )
-        self.lableBudgetDay.setAlignment(Qt.AlignCenter)
+        self.lableBudgetDay.setAlignment(Qt.AlignCenter) # type: ignore[attr-defined]
         self.addExpenseButton = QPushButton(self.centralwidget)
         self.addExpenseButton.setObjectName("addExpenseButton")
         self.addExpenseButton.setGeometry(QRect(10, 10, 91, 31))
@@ -138,12 +143,12 @@ class Ui_MainWindow(object):
         self.label.setObjectName("label")
         self.label.setGeometry(QRect(10, 660, 71, 31))
         self.label.setStyleSheet("font: 11pt")
-        self.label.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         self.label_2 = QLabel(self.centralwidget)
         self.label_2.setObjectName("label_2")
         self.label_2.setGeometry(QRect(10, 700, 71, 31))
         self.label_2.setStyleSheet("font: 11pt")
-        self.label_2.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_2.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         self.lableBudgetWeek = QLabel(self.centralwidget)
         self.lableBudgetWeek.setObjectName("lableBudgetWeek")
         self.lableBudgetWeek.setGeometry(QRect(90, 700, 271, 31))
@@ -152,7 +157,7 @@ class Ui_MainWindow(object):
             "font: 11pt;\n"
             "border-radius: 10px"
         )
-        self.lableBudgetWeek.setAlignment(Qt.AlignCenter)
+        self.lableBudgetWeek.setAlignment(Qt.AlignCenter) # type: ignore[attr-defined]
         self.lableBudgetMonth = QLabel(self.centralwidget)
         self.lableBudgetMonth.setObjectName("lableBudgetMonth")
         self.lableBudgetMonth.setGeometry(QRect(90, 740, 271, 31))
@@ -161,12 +166,12 @@ class Ui_MainWindow(object):
             "font: 11pt;\n"
             "border-radius: 10px"
         )
-        self.lableBudgetMonth.setAlignment(Qt.AlignCenter)
+        self.lableBudgetMonth.setAlignment(Qt.AlignCenter) # type: ignore[attr-defined]
         self.label_3 = QLabel(self.centralwidget)
         self.label_3.setObjectName("label_3")
         self.label_3.setGeometry(QRect(10, 740, 71, 31))
         self.label_3.setStyleSheet("font: 11pt")
-        self.label_3.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_3.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")

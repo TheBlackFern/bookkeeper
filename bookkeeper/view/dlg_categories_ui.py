@@ -12,13 +12,12 @@ from PySide6.QtWidgets import (
 )
 
 
-class Dialog_Categories(QDialog):
+class DialogCategories(QDialog):
     """
     Class for a pop up for displaying the categories.
     Has a title line, a tree widget and a remove category button.
     """
-
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.resize(482, 515)
         self.setWindowTitle("Список категорий")
@@ -32,7 +31,7 @@ class Dialog_Categories(QDialog):
             "font: 11pt;\n"
             "border-radius: 10px"
         )
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignCenter) # type: ignore[attr-defined]
         self.label.setText("Список категорий")
         self.verticalLayout.addWidget(self.label)
 

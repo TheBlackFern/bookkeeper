@@ -15,14 +15,13 @@ from PySide6.QtWidgets import (
 )
 
 
-class Dialog_Expense(QDialog):
+class DialogExpense(QDialog):
     """
     Class for a pop up for adding in an expense.
     Has four lines, for a date, name, category and a comment, that are all labelled.
     Date line has a background text to hint at date format.
     """
-
-    def __init__(self, cats):
+    def __init__(self, cats: list[tuple[str, str | None]]) -> None:
         super().__init__()
         self.setWindowTitle("Добавление траты")
         self.gridLayout = QGridLayout()
@@ -41,25 +40,25 @@ class Dialog_Expense(QDialog):
         self.resize(450, 258)
 
         self.buttonBox.setObjectName("buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+        self.buttonBox.setOrientation(Qt.Horizontal) # type: ignore[attr-defined]
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok) # type: ignore[attr-defined]
+        self.buttonBox.accepted.connect(self.accept) # type: ignore[attr-defined]
+        self.buttonBox.rejected.connect(self.reject) # type: ignore[attr-defined]
 
         self.label_3.setObjectName("label_3")
-        self.label_3.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_3.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         self.label_3.setText("Дата")
 
         self.label_4.setObjectName("label_4")
-        self.label_4.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_4.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         self.label_4.setText("Сумма")
 
         self.label_5.setObjectName("label_5")
-        self.label_5.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_5.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         self.label_5.setText("Категория")
 
         self.label_6.setObjectName("label_6")
-        self.label_6.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        self.label_6.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter) # type: ignore[attr-defined]
         self.label_6.setText("Комментарий")
 
         self.setDateLine.setObjectName("setDateLine")
