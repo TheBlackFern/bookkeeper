@@ -7,6 +7,7 @@ from typing import Generic, Type, Any
 
 from bookkeeper.repository.abstract_repository import T
 
+
 class SQLiteRepository(Generic[T]):
     """
     Repository that works with an SQLite database.
@@ -59,7 +60,7 @@ class SQLiteRepository(Generic[T]):
         return obj.pk
 
     def _covert_row(self, row_: list[str]) -> T:
-        fields = {field: entry for field, entry in zip(self.fields, row_[1:])}
+        fields = dict(zip(self.fields, row_[1:]))
         fields["pk"] = row_[0]
         res_obj = self.entry_cls(**fields)
         return res_obj
@@ -109,7 +110,7 @@ class SQLiteRepository(Generic[T]):
         with sqlite3.connect(self.db_name) as con:
             cur = con.cursor()
             cur.execute(
-                f"""UPDATE {self.table_name} SET {self.fields_with_marks} 
+                f"""UPDATE {self.table_name} SET {self.fields_with_marks}
                 WHERE id=={obj.pk}""",
                 new_values,
             )

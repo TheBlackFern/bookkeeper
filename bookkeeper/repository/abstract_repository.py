@@ -4,7 +4,7 @@ Repository protocol class module.
 This may be short-cited, but to arguably reduce coupling (and to test myself) I swithced
 from double inheritance from ABC and Generic[T] to a generic Protocol of T.
 
-An object which follows the protocol would implement entry storage, which assigns 
+An object which follows the protocol would implement entry storage, which assigns
 a unique primary key (pk) to each entry. Objects to be stored should implement
 the pk attribute and should not use it otherwise.
 """
